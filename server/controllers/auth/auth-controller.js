@@ -84,16 +84,20 @@ const logoutUser = (req, res) => {
 
 // auth middleware
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization; // "Bearer <token>"
+  const authHeader = req.headers.authorization;
   if (!authHeader)
     return res.status(401).json({ success: false, message: "Unauthorised" });
 
   const token = authHeader.split(" ")[1];
   try {
+    if (!process.env.CLIENT_SECRET_KEY)
+      throw new Error("JWT Secret not defined");
+
     const decoded = jwt.verify(token, process.env.CLIENT_SECRET_KEY);
     req.user = decoded;
     next();
   } catch (err) {
+    console.error("JWT Error:", err.message);
     res.status(401).json({ success: false, message: "Unauthorised" });
   }
 };
