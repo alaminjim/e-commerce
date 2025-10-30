@@ -1,4 +1,4 @@
-# E-Commerce (TEAM NM) 🚀
+# E-Commerce 🚀
 
 A full-stack e-commerce web application built with React (client) and Node/Express (server).  
 This repository contains both the `client` and `server` folders. The project includes user authentication, product listing, cart & checkout flow, admin panel, and Stripe payment integration (if configured).
