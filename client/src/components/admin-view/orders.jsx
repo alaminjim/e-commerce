@@ -89,7 +89,10 @@ function AdminOrdersView() {
                         >
                           View Details
                         </Button>
-                        <AdminOrderDetailsView orderDetails={orderDetails} />
+                        <AdminOrderDetailsView
+                          setOpenDetailsDialog={setOpenDetailsDialog}
+                          orderDetails={orderDetails}
+                        />
                       </Dialog>
                     </TableCell>
                   </TableRow>
