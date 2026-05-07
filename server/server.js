@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 // CORS for localhost only
 app.use(
   cors({
-    origin: "https://e-commerce-shop-d6930c.netlify.app",
+    origin: ["https://e-commerce-shop-d6930c.netlify.app", "https://e-commerce-rosy-three-71.vercel.app"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -52,3 +52,5 @@ app.use("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+
+module.exports = app;
