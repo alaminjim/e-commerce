@@ -1,5 +1,6 @@
 import CommonForm from "@/components/common/form";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { loginFormControls } from "@/config";
 import { loginUser } from "@/store/auth-slice";
