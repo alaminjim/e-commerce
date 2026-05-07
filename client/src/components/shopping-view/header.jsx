@@ -1,4 +1,4 @@
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { HousePlug, LogOut, Menu, ShoppingCart, UserCog, UserCircle } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -18,7 +18,16 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { logoutUser } from "@/store/auth-slice";
+import { logoutUser, updateProfileAction } from "@/store/auth-slice";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { useToast } from "../ui/use-toast";
 import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
@@ -65,16 +74,42 @@ function MenuItems() {
 }
 
 function HeaderRightContent() {
-  const { user } = useSelector((state) => state.auth);
+  const { user, isActionLoading } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const [openCartSheet, setOpenCartSheet] = useState(false);
+  const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
+  const [newUserName, setNewUserName] = useState(user?.userName || "");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { toast } = useToast();
 
   function handleLogout() {
     dispatch(logoutUser());
     localStorage.removeItem("authToken");
     navigate("/auth/login");
+  }
+
+  function handleUpdateProfile() {
+    if (!newUserName.trim()) return;
+
+    dispatch(
+      updateProfileAction({
+        userId: user.id,
+        userName: newUserName,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        toast({
+          title: "Profile updated successfully!",
+        });
+        setOpenEditProfileDialog(false);
+      } else {
+        toast({
+          title: data?.payload?.message || "Update failed",
+          variant: "destructive",
+        });
+      }
+    });
   }
 
   useEffect(() => {
@@ -123,6 +158,10 @@ function HeaderRightContent() {
               <UserCog className="mr-2 h-4 w-4" />
               Account
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setOpenEditProfileDialog(true)}>
+              <UserCircle className="mr-2 h-4 w-4" />
+              Edit Profile
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
@@ -131,6 +170,39 @@ function HeaderRightContent() {
           </DropdownMenuContent>
         </DropdownMenu>
       )}
+
+      <Dialog
+        open={openEditProfileDialog}
+        onOpenChange={() => setOpenEditProfileDialog(false)}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="username" className="text-right">
+                Username
+              </Label>
+              <Input
+                id="username"
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              disabled={isActionLoading}
+              type="button"
+              onClick={handleUpdateProfile}
+            >
+              {isActionLoading ? "Updating..." : "Save changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

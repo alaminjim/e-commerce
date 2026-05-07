@@ -176,10 +176,60 @@ const googleLogin = async (req, res) => {
   }
 };
 
+// update profile
+const updateProfile = async (req, res) => {
+  try {
+    const { userId, userName } = req.body;
+
+    if (!userId || !userName) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID and Username are required!",
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    // Check if new userName is already taken by another user
+    const existingUser = await User.findOne({ userName, _id: { $ne: userId } });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Username already taken! Please try another one.",
+      });
+    }
+
+    user.userName = userName;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        id: user._id,
+        email: user.email,
+        userName: user.userName,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Update Profile Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   authMiddleware,
   googleLogin,
+  updateProfile,
 };
+

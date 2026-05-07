@@ -5,13 +5,15 @@ const {
   logoutUser,
   authMiddleware,
   googleLogin,
+  updateProfile,
 } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.post("/google", googleLogin); // Added Google Login Route
+router.post("/google", googleLogin);
+router.put("/update-profile", authMiddleware, updateProfile);
 router.post("/logout", logoutUser);
 router.get("/check-auth", authMiddleware, (req, res) => {
   const user = req.user;

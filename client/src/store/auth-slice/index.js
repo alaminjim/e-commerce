@@ -80,6 +80,29 @@ export const logoutUser = createAsyncThunk("/auth/logout", async () => {
   return { success: true };
 });
 
+// Update Profile
+export const updateProfileAction = createAsyncThunk(
+  "/auth/updateProfile",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.put(
+        `${import.meta.env.VITE_SERVER_URL}/api/auth/update-profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data || "Update profile failed");
+    }
+  }
+);
+
 // Check authentication
 export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
@@ -165,6 +188,17 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.error = action.payload?.message || "Google login failed";
+      })
+      // Update Profile
+      .addCase(updateProfileAction.pending, (state) => {
+        state.isActionLoading = true;
+      })
+      .addCase(updateProfileAction.fulfilled, (state, action) => {
+        state.isActionLoading = false;
+        state.user = action.payload.user;
+      })
+      .addCase(updateProfileAction.rejected, (state) => {
+        state.isActionLoading = false;
       })
 
       // Check auth
