@@ -64,6 +64,38 @@ function AuthLogin() {
         onSubmit={onSubmit}
         isLoading={isActionLoading}
       />
+      
+      {/* Demo Login Buttons */}
+      <div className="mt-6 space-y-4">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or Try Demo
+            </span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <Button 
+            onClick={() => setFormData({ email: "admin@gmail.com", password: "12345678" })}
+            variant="outline" 
+            className="border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300"
+          >
+            Admin Demo
+          </Button>
+          <Button 
+            onClick={() => setFormData({ email: "ash@gmail.com", password: "12345678" })}
+            variant="outline"
+            className="border-secondary text-secondary hover:bg-secondary hover:text-white transition-all duration-300"
+          >
+            User Demo
+          </Button>
+        </div>
+      </div>
+
       <div className="mt-4 flex flex-col gap-3">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
