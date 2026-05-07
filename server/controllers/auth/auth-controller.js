@@ -5,6 +5,14 @@ const User = require("../../models/User");
 // register
 const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
+
+  if (!userName || !email || !password) {
+    return res.json({
+      success: false,
+      message: "Please provide all required fields",
+    });
+  }
+
   try {
     const checkUser = await User.findOne({ email });
     if (checkUser)

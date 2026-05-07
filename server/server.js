@@ -13,7 +13,7 @@ const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
 
 const commonFeatureRouter = require("./routes/common/feature-routes");
-const { default: connectDB } = require("./helpers/db");
+const connectDB = require("./helpers/db");
 
 // Database connection
 connectDB();
