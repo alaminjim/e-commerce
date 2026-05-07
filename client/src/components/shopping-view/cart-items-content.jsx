@@ -21,9 +21,12 @@ function UserCartItemsContent({ cartItem }) {
         );
 
         const getCurrentProductIndex = productList.findIndex(
-          (product) => product._id === getCartItem?.productId
+          (product) => product?._id === getCartItem?.productId
         );
-        const getTotalStock = productList[getCurrentProductIndex].totalStock;
+
+        if (getCurrentProductIndex === -1) return;
+
+        const getTotalStock = productList[getCurrentProductIndex]?.totalStock;
 
         if (indexOfCurrentCartItem > -1) {
           const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
