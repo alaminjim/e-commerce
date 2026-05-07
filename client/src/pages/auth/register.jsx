@@ -3,7 +3,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { registerFormControls } from "@/config";
 import { registerUser } from "@/store/auth-slice";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 const initialState = {
@@ -14,6 +14,7 @@ const initialState = {
 
 function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
+  const { isLoading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -57,6 +58,7 @@ function AuthRegister() {
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
+        isLoading={isLoading}
       />
     </div>
   );

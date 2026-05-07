@@ -1,15 +1,12 @@
-import Stripe from "stripe";
-import dotenv from "dotenv";
-import Order from "../../models/Order.js";
-import Cart from "../../models/Cart.js";
-import Product from "../../models/Product.js";
-
-dotenv.config();
+const Stripe = require("stripe");
+const Order = require("../../models/Order");
+const Cart = require("../../models/Cart");
+const Product = require("../../models/Product");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Create Stripe Checkout Session & save order
-export const createOrder = async (req, res) => {
+const createOrder = async (req, res) => {
   try {
     const {
       userId,
@@ -55,7 +52,6 @@ export const createOrder = async (req, res) => {
       })),
       mode: "payment",
       success_url: `${process.env.CLIENT_URL}/shop/stripe-success?orderId=${newlyCreatedOrder._id}`,
-      // Payment cancel বা fail হলে এই URL-এ redirect হবে
       cancel_url: `${process.env.CLIENT_URL}/shop/payment-failed`,
     });
 
@@ -73,7 +69,7 @@ export const createOrder = async (req, res) => {
 };
 
 // Capture payment after Stripe webhook or success redirect
-export const capturePayment = async (req, res) => {
+const capturePayment = async (req, res) => {
   try {
     const { orderId, paymentIntentId } = req.body;
 
@@ -97,8 +93,8 @@ export const capturePayment = async (req, res) => {
       }
     }
 
-    // Delete cart
-    await Cart.findByIdAndDelete(order.cartId);
+    // ✅ Clear cart for this user after successful purchase
+    await Cart.findOneAndDelete({ userId: order.userId });
 
     await order.save();
 
@@ -112,7 +108,7 @@ export const capturePayment = async (req, res) => {
 };
 
 // Get all orders for a user
-export const getAllOrdersByUser = async (req, res) => {
+const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
     const orders = await Order.find({ userId });
@@ -128,7 +124,7 @@ export const getAllOrdersByUser = async (req, res) => {
 };
 
 // Get order details
-export const getOrderDetails = async (req, res) => {
+const getOrderDetails = async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findById(id);
@@ -143,4 +139,11 @@ export const getOrderDetails = async (req, res) => {
       .status(500)
       .json({ success: false, message: "Fetching order details failed" });
   }
+};
+
+module.exports = {
+  createOrder,
+  capturePayment,
+  getAllOrdersByUser,
+  getOrderDetails,
 };
