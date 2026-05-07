@@ -13,6 +13,7 @@ import {
   Shirt,
   ShirtIcon,
   ShoppingBasket,
+  StarIcon,
   UmbrellaIcon,
   WashingMachine,
   WatchIcon,
@@ -257,6 +258,125 @@ function ShoppingHome() {
                     />
                   ))
               : null}
+          </div>
+        </div>
+      </section>
+
+      {/* Men's Collection Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Men's Exclusive Collection
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {productList && productList.length > 0
+              ? productList
+                  .filter((item) => item.category === "men")
+                  .slice(0, 4)
+                  .map((productItem, idx) => (
+                    <ShoppingProductTile
+                      key={idx}
+                      handleGetProductDetails={handleGetProductDetails}
+                      product={productItem}
+                      handleAddtoCart={handleAddtoCart}
+                    />
+                  ))
+              : null}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h2 className="text-3xl font-bold text-center mb-10">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            {[
+              {
+                q: "What is your return policy?",
+                a: "We offer a 30-day return policy for all unused items in their original packaging.",
+              },
+              {
+                q: "How long does shipping take?",
+                a: "Standard shipping usually takes 3-5 business days within the country.",
+              },
+              {
+                q: "Do you offer international shipping?",
+                a: "Yes, we ship to over 50 countries worldwide with variable shipping rates.",
+              },
+              {
+                q: "How can I track my order?",
+                a: "Once your order is shipped, you will receive a tracking link via email.",
+              },
+            ].map((faq, idx) => (
+              <div key={idx} className="border rounded-lg p-5 bg-white shadow-sm">
+                <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  <span className="text-primary">Q:</span> {faq.q}
+                </h3>
+                <p className="text-muted-foreground">
+                  <span className="font-bold text-gray-700">A:</span> {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-12 bg-gray-900 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-10">What Our Customers Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "John Doe",
+                text: "The quality of products is amazing. Highly recommended!",
+                role: "Verified Customer",
+              },
+              {
+                name: "Sarah Smith",
+                text: "Super fast delivery and the size fits perfectly. Love it!",
+                role: "Verified Buyer",
+              },
+              {
+                name: "Mike Johnson",
+                text: "Customer support was very helpful with my exchange request.",
+                role: "Happy Customer",
+              },
+            ].map((testi, idx) => (
+              <div key={idx} className="bg-gray-800 p-8 rounded-xl">
+                <div className="flex justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <StarIcon key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  ))}
+                </div>
+                <p className="italic mb-6">"{testi.text}"</p>
+                <h4 className="font-bold">{testi.name}</h4>
+                <span className="text-sm text-gray-400">{testi.role}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-20 bg-primary text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-extrabold mb-4">Join Our Newsletter</h2>
+          <p className="text-xl mb-10 opacity-90">
+            Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              className="px-6 py-4 rounded-full text-black w-full outline-none focus:ring-4 focus:ring-white/20 transition-all"
+            />
+            <Button className="bg-black hover:bg-gray-800 text-white px-10 py-4 rounded-full font-bold text-lg">
+              Subscribe
+            </Button>
           </div>
         </div>
       </section>
