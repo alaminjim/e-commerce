@@ -1,4 +1,5 @@
 import CommonForm from "@/components/common/form";
+import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 import { useToast } from "@/components/ui/use-toast";
 import { loginFormControls } from "@/config";
 import { loginUser } from "@/store/auth-slice";
@@ -14,7 +15,7 @@ const initialState = {
 function AuthLogin() {
   const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isActionLoading } = useSelector((state) => state.auth);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -61,8 +62,21 @@ function AuthLogin() {
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
-        isLoading={isLoading}
+        isLoading={isActionLoading}
       />
+      <div className="mt-4 flex flex-col gap-3">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+        <GoogleLoginButton />
+      </div>
     </div>
   );
 }

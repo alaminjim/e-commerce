@@ -4,7 +4,8 @@ import axios from "axios";
 
 const initialState = {
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true, // Keep global loading as true initially
+  isActionLoading: false, // New state for buttons
   user: null,
   error: null,
 };
@@ -27,6 +28,27 @@ export const registerUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || "Registration failed");
+    }
+  }
+);
+
+// Google login
+export const googleLoginAction = createAsyncThunk(
+  "/auth/googleLogin",
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/api/auth/google`,
+        { token }
+      );
+
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data || "Google login failed");
     }
   }
 );
@@ -97,16 +119,16 @@ const authSlice = createSlice({
     builder
       // Register
       .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
+        state.isActionLoading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isActionLoading = false;
         state.user = action.payload.user || null;
         state.isAuthenticated = !!action.payload.token;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isActionLoading = false;
         state.user = null;
         state.isAuthenticated = false;
         state.error = action.payload?.message || "Registration failed";
@@ -114,19 +136,35 @@ const authSlice = createSlice({
 
       // Login
       .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
+        state.isActionLoading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isActionLoading = false;
         state.user = action.payload.user || null;
         state.isAuthenticated = !!action.payload.token;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isActionLoading = false;
         state.user = null;
         state.isAuthenticated = false;
         state.error = action.payload?.message || "Login failed";
+      })
+      // Google Login
+      .addCase(googleLoginAction.pending, (state) => {
+        state.isActionLoading = true;
+        state.error = null;
+      })
+      .addCase(googleLoginAction.fulfilled, (state, action) => {
+        state.isActionLoading = false;
+        state.user = action.payload.user || null;
+        state.isAuthenticated = !!action.payload.token;
+      })
+      .addCase(googleLoginAction.rejected, (state, action) => {
+        state.isActionLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = action.payload?.message || "Google login failed";
       })
 
       // Check auth

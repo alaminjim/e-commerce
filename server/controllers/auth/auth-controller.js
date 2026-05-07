@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
+const { OAuth2Client } = require("google-auth-library");
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // register
 const registerUser = async (req, res) => {
@@ -120,4 +123,63 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, logoutUser, authMiddleware };
+// google login
+const googleLogin = async (req, res) => {
+  const { token } = req.body;
+  try {
+    // Fetch user info from Google using the access token
+    const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+    const data = await response.json();
+
+    if (!data || !data.email) {
+      return res.status(400).json({ success: false, message: "Invalid Google token" });
+    }
+
+    const { name, email, sub } = data;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        userName: name || email.split("@")[0],
+        email: email,
+        password: sub,
+      });
+      await user.save();
+    }
+
+    const jwtToken = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+        email: user.email,
+        userName: user.userName,
+      },
+      process.env.CLIENT_SECRET_KEY,
+      { expiresIn: "365d" }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Google login successful",
+      token: jwtToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        userName: user.userName,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    res.status(500).json({ success: false, message: "Google Auth Failed" });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  logoutUser,
+  authMiddleware,
+  googleLogin,
+};

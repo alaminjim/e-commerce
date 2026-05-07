@@ -6,11 +6,15 @@ import { Provider } from "react-redux";
 import store from "./store/store.js";
 import { Toaster } from "./components/ui/toaster.jsx";
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Provider store={store}>
-      <App />
-      <Toaster />
+      <GoogleOAuthProvider clientId="381316880548-0miuurkqio4dbuhbkce31cbmuaeo2ekh.apps.googleusercontent.com">
+        <App />
+        <Toaster />
+      </GoogleOAuthProvider>
     </Provider>
   </BrowserRouter>
 );
