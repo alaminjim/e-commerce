@@ -6,6 +6,7 @@ const {
   authMiddleware,
   googleLogin,
   updateProfile,
+  checkAuth,
 } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
@@ -15,13 +16,6 @@ router.post("/login", loginUser);
 router.post("/google", googleLogin);
 router.put("/update-profile", authMiddleware, updateProfile);
 router.post("/logout", logoutUser);
-router.get("/check-auth", authMiddleware, (req, res) => {
-  const user = req.user;
-  res.status(200).json({
-    success: true,
-    message: "Authenticated user!",
-    user,
-  });
-});
+router.get("/check-auth", authMiddleware, checkAuth);
 
 module.exports = router;

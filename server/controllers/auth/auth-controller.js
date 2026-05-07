@@ -87,6 +87,8 @@ const loginUser = async (req, res) => {
         email: checkUser.email,
         userName: checkUser.userName,
         role: checkUser.role,
+        bio: checkUser.bio,
+        phone: checkUser.phone,
       },
     });
   } catch (err) {
@@ -168,6 +170,8 @@ const googleLogin = async (req, res) => {
         email: user.email,
         userName: user.userName,
         role: user.role,
+        bio: user.bio,
+        phone: user.phone,
       },
     });
   } catch (error) {
@@ -179,12 +183,12 @@ const googleLogin = async (req, res) => {
 // update profile
 const updateProfile = async (req, res) => {
   try {
-    const { userId, userName } = req.body;
+    const { userId, userName, bio, phone } = req.body;
 
-    if (!userId || !userName) {
+    if (!userId) {
       return res.status(400).json({
         success: false,
-        message: "User ID and Username are required!",
+        message: "User ID is required!",
       });
     }
 
@@ -196,16 +200,23 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    // Check if new userName is already taken by another user
-    const existingUser = await User.findOne({ userName, _id: { $ne: userId } });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Username already taken! Please try another one.",
+    if (userName) {
+      const existingUser = await User.findOne({
+        userName,
+        _id: { $ne: userId },
       });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: "Username already taken! Please try another one.",
+        });
+      }
+      user.userName = userName;
     }
 
-    user.userName = userName;
+    if (bio !== undefined) user.bio = bio;
+    if (phone !== undefined) user.phone = phone;
+
     await user.save();
 
     res.status(200).json({
@@ -216,10 +227,41 @@ const updateProfile = async (req, res) => {
         email: user.email,
         userName: user.userName,
         role: user.role,
+        bio: user.bio,
+        phone: user.phone,
       },
     });
   } catch (error) {
     console.error("Update Profile Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+// check-auth
+const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Authenticated user!",
+      user: {
+        id: user._id,
+        email: user.email,
+        userName: user.userName,
+        role: user.role,
+        bio: user.bio,
+        phone: user.phone,
+      },
+    });
+  } catch (error) {
+    console.error("Check Auth Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -231,5 +273,7 @@ module.exports = {
   authMiddleware,
   googleLogin,
   updateProfile,
+  checkAuth,
 };
+
 
