@@ -83,14 +83,14 @@ function AuthLogin() {
           <Button 
             onClick={() => setFormData({ email: "admin@gmail.com", password: "12345678" })}
             variant="outline" 
-            className="border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300"
+            className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 font-semibold"
           >
             Admin Demo
           </Button>
           <Button 
             onClick={() => setFormData({ email: "ash@gmail.com", password: "12345678" })}
             variant="outline"
-            className="border-secondary text-secondary hover:bg-secondary hover:text-white transition-all duration-300"
+            className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300 font-semibold"
           >
             User Demo
           </Button>
