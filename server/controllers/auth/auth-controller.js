@@ -21,6 +21,13 @@ const registerUser = async (req, res) => {
         message: "User Already exists with the same email! Please try again",
       });
 
+    const checkUserName = await User.findOne({ userName });
+    if (checkUserName)
+      return res.json({
+        success: false,
+        message: "Username already taken! Please try another one",
+      });
+
     const hashPassword = await bcrypt.hash(password, 12);
     const newUser = new User({ userName, email, password: hashPassword });
     await newUser.save();
@@ -30,8 +37,11 @@ const registerUser = async (req, res) => {
       message: "Registration successful",
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Registration Error:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Internal Server Error" 
+    });
   }
 };
 
