@@ -120,19 +120,21 @@ const adminOrderSlice = createSlice({
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update the specific order in orderList
-        const index = state.orderList.findIndex(
-          (order) => order._id === action.payload.data._id
-        );
-        if (index !== -1) {
-          state.orderList[index] = action.payload.data;
-        }
-        // Also update orderDetails if currently viewed
-        if (
-          state.orderDetails &&
-          state.orderDetails._id === action.payload.data._id
-        ) {
-          state.orderDetails = action.payload.data;
+        if (action.payload?.data) {
+          // Update the specific order in orderList
+          const index = state.orderList.findIndex(
+            (order) => order?._id === action.payload.data._id
+          );
+          if (index !== -1) {
+            state.orderList[index] = action.payload.data;
+          }
+          // Also update orderDetails if currently viewed
+          if (
+            state.orderDetails &&
+            state.orderDetails._id === action.payload.data._id
+          ) {
+            state.orderDetails = action.payload.data;
+          }
         }
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
