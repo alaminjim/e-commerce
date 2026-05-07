@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import CommonForm from "../common/form";
-import { DialogContent } from "../ui/dialog";
+import { DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
@@ -44,6 +44,10 @@ function AdminOrderDetailsView({ orderDetails, setOpenDetailsDialog }) {
 
   return (
     <DialogContent className="sm:max-w-[600px]">
+      <DialogTitle className="sr-only">Order Details</DialogTitle>
+      <DialogDescription className="sr-only">
+        View and update order status details
+      </DialogDescription>
       <div className="grid gap-6">
         <div className="grid gap-2">
           <div className="flex mt-6 items-center justify-between">
