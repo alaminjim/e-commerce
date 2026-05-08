@@ -2,6 +2,7 @@ import ProductFilter from "@/components/shopping-view/filter";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/common/loading-spinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { useDebounce } from "@/hooks/useDebounce";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -37,7 +39,7 @@ function createSearchParamsHelper(filterParams) {
 
 function ShoppingListing() {
   const dispatch = useDispatch();
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -47,6 +49,10 @@ function ShoppingListing() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { toast } = useToast();
+
+  // Debounce filters to prevent excessive API calls
+  const debouncedFilters = useDebounce(filters, 500);
+  const debouncedSort = useDebounce(sort, 300);
 
   const categorySearchParam = searchParams.get("category");
 
@@ -122,18 +128,18 @@ function ShoppingListing() {
   }, [categorySearchParam]);
 
   useEffect(() => {
-    if (filters && Object.keys(filters).length > 0) {
-      const createQueryString = createSearchParamsHelper(filters);
+    if (debouncedFilters && Object.keys(debouncedFilters).length > 0) {
+      const createQueryString = createSearchParamsHelper(debouncedFilters);
       setSearchParams(new URLSearchParams(createQueryString));
     }
-  }, [filters]);
+  }, [debouncedFilters]);
 
   useEffect(() => {
-    if (filters !== null && sort !== null)
+    if (debouncedFilters !== null && debouncedSort !== null)
       dispatch(
-        fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
+        fetchAllFilteredProducts({ filterParams: debouncedFilters, sortParams: debouncedSort })
       );
-  }, [dispatch, sort, filters]);
+  }, [dispatch, debouncedSort, debouncedFilters]);
 
   useEffect(() => {
     if (productDetails !== null) setOpenDetailsDialog(true);
@@ -176,16 +182,24 @@ function ShoppingListing() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {productList && productList.length > 0
-            ? productList.map((productItem, idx) => (
-                <ShoppingProductTile
-                  key={idx}
-                  handleGetProductDetails={handleGetProductDetails}
-                  product={productItem}
-                  handleAddtoCart={handleAddtoCart}
-                />
-              ))
-            : null}
+          {isLoading ? (
+            <div className="col-span-full flex justify-center py-12">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : productList && productList.length > 0 ? (
+            productList.map((productItem, idx) => (
+              <ShoppingProductTile
+                key={idx}
+                handleGetProductDetails={handleGetProductDetails}
+                product={productItem}
+                handleAddtoCart={handleAddtoCart}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              No products found matching your criteria
+            </div>
+          )}
         </div>
       </div>
       <ProductDetailsDialog

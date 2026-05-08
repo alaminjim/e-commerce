@@ -4,7 +4,7 @@ import axios from "axios";
 
 const initialState = {
   isAuthenticated: false,
-  isLoading: true, // Keep global loading as true initially
+  isLoading: false, // Start with false to avoid blocking
   isActionLoading: false, // New state for buttons
   user: null,
   error: null,

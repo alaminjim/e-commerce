@@ -15,25 +15,23 @@ import ShoppingCheckout from "./pages/shopping-view/checkout";
 import ShoppingAccount from "./pages/shopping-view/account";
 import CheckAuth from "./components/common/check-auth";
 import UnauthPage from "./pages/unauth-page";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { checkAuth } from "./store/auth-slice";
+import { useAuthCheck } from "./hooks/useAuthCheck";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
 import StripeSuccessPage from "./pages/shopping-view/StripeSuccessPage";
 
 function App() {
-  const { user, isAuthenticated, isLoading } = useSelector(
-    (state) => state.auth
+  const { user, isAuthenticated, isLoading } = useAuthCheck();
+
+  if (isLoading) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="text-gray-600 text-sm">Loading...</p>
+      </div>
+    </div>
   );
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
-
-  if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]" />;
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">

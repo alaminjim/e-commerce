@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/common/loading-spinner";
 import bannerOne from "../../assets/banner-1.webp";
 import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
@@ -51,10 +52,10 @@ const brandsWithIcon = [
 
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, isLoading: productsLoading } = useSelector(
     (state) => state.shopProducts
   );
-  const { featureImageList } = useSelector((state) => state.commonFeature);
+  const { featureImageList, isLoading: featuresLoading } = useSelector((state) => state.commonFeature);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
@@ -116,19 +117,23 @@ function ShoppingHome() {
     return () => clearInterval(timer);
   }, [featureImageList]);
 
-  // Fetch all products
+  // Fetch data in parallel with loading state
   useEffect(() => {
-    dispatch(
-      fetchAllFilteredProducts({
-        filterParams: {},
-        sortParams: "price-lowtohigh",
-      })
-    );
-  }, [dispatch]);
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(fetchAllFilteredProducts({
+            filterParams: {},
+            sortParams: "price-lowtohigh",
+          })),
+          dispatch(getFeatureImages())
+        ]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-  // Fetch feature images
-  useEffect(() => {
-    dispatch(getFeatureImages());
+    fetchData();
   }, [dispatch]);
 
   return (
@@ -245,20 +250,30 @@ function ShoppingHome() {
           <h2 className="text-3xl font-bold text-center mb-8">
             Feature Products
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0
-              ? productList
-                  .slice(0, 12)
-                  .map((productItem, idx) => (
-                    <ShoppingProductTile
-                      key={idx}
-                      handleGetProductDetails={handleGetProductDetails}
-                      product={productItem}
-                      handleAddtoCart={handleAddtoCart}
-                    />
-                  ))
-              : null}
-          </div>
+          {productsLoading ? (
+            <div className="flex justify-center py-12">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {productList && productList.length > 0
+                ? productList
+                    .slice(0, 12)
+                    .map((productItem, idx) => (
+                      <ShoppingProductTile
+                        key={idx}
+                        handleGetProductDetails={handleGetProductDetails}
+                        product={productItem}
+                        handleAddtoCart={handleAddtoCart}
+                      />
+                    ))
+                : (
+                  <div className="col-span-full text-center py-12 text-gray-500">
+                    No products available
+                  </div>
+                )}
+            </div>
+          )}
         </div>
       </section>
 
