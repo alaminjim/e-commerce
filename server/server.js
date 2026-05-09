@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
+const morgan = require("morgan");
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductsRouter = require("./routes/admin/products-routes");
 const adminOrderRouter = require("./routes/admin/order-routes");
@@ -31,6 +33,8 @@ app.use(
 );
 
 app.use(express.json());
+app.use(compression());
+app.use(morgan("dev"));
 
 // Routes
 app.use("/api/auth", authRouter);

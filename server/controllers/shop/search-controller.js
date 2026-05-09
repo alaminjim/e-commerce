@@ -21,7 +21,7 @@ const searchProducts = async (req, res) => {
       ],
     };
 
-    const searchResults = await Product.find(createSearchQuery);
+    const searchResults = await Product.find(createSearchQuery).lean();
 
     res.status(200).json({
       success: true,
